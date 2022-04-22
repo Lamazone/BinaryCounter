@@ -18,7 +18,6 @@ CounterWidget::CounterWidget(QWidget *parent)
 
     m_gpio = new Gpio(this);
 
-
     connect(&m_timer, &QTimer::timeout, this, &CounterWidget::updateCounter);
     m_timer.start(T_UPDATE);
 }
@@ -35,7 +34,7 @@ void CounterWidget::updateCounter()
         for (auto pin : BUTTONS)
         {
             int state = !m_gpio->get(pin);
-            if(m_gpio->edgeDetect(state, true, n))
+            if(m_gpio->isActivated(pin))
             {
                 if(n==0)
                 {
