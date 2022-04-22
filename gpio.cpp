@@ -34,6 +34,20 @@ void Gpio::set(int pin, bool value)
     if (result < 0)
         throw lguErrorText(result);
 }
+void Gpio::set(int pattern)
+{
+    int n = 0;
+    int value = 0;
+    for (auto pin: LEDS)
+    {
+        value=(pattern>>n)&1;
+       // n-te Stelle vom pattern ausmaskieren, value =
+       lgGpioWrite(m_handle, pin, value);
+
+       // Maske um 1 Stelle nach vorne verschieben
+        n++;
+    }
+}
 
 
 // Read pin state
@@ -55,9 +69,30 @@ bool Gpio::isActivated(int pin)
     // rising slope detection
     bool rising = false;
     int index = BUTTONS.indexOf(pin);
-    if (!result > m_oldstates[index]) // !result weil gedrueckt = LO
+    if (!result > m_oldstates[index]) // !result weil gedrueckt = LOW
         rising = true;
 
     m_oldstates[index] = !result;
     return rising;
+}
+bool Gpio::edgeDetect(int state, bool edge, int nr)
+{
+    // state when button pressed: true
+    // state idle: false due to the inversion at the beginning
+
+    if(m_oldstates[nr] == state)  //state= true
+    {
+        if(state == edge)     //edge= true
+        {
+           m_oldstates[nr]= !state;    // m_oldstates= false
+           return true;
+        }
+        m_oldstates[nr]= !state;
+        return false;
+    }
+    else
+    {
+        m_oldstates[nr]= !state;    // state= false
+        return false;
+    }
 }

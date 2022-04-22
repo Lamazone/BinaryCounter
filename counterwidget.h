@@ -20,7 +20,9 @@ public slots:
 private:
      int m_count;
      QTimer m_timer;
-     Gpio m_gpio;
+     Gpio* m_gpio;
+     QLCDNumber* m_display;
+     int m_counter = 0;
 
 };
 
